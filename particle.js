@@ -10,6 +10,7 @@ export class Particle {
     bonds;
 
     constructor(
+        id,
         image, // The image for this element: file path
         position, // The particle's position in space: Vector
         velocity, // The particle's velocity: Vector
@@ -20,6 +21,7 @@ export class Particle {
         charge, // The charge the element exerts on nearby particles - a function of electron state: Float
         bonds, // A list of bonds currently connected to the element
         ) {
+        this.id = id;
         this.image = image;
         this.position = position;
         this.velocity = velocity;

@@ -1,11 +1,13 @@
-import { oxygen } from "./oxygen.js";
-import { carbon } from "./carbon.js";
 import { Vector } from "./vector.js";
+import { Bond } from "./bond.js";
+import { levelOne } from "./levels.js";
 
 const CANVAS_WIDTH = 600;
 const CHECK_RADIUS = 200;
 
-const levelOne = [oxygen, carbon];
+
+let bonds = [];
+let bondId = 0;
 
 export function updateScene(context) {
     for (let i = 0; i < levelOne.length; i++) {
@@ -14,11 +16,12 @@ export function updateScene(context) {
         if (collision[0] > 0) {
             resolveCollision(particle, collision);
         }
-        formBonds(i, context);
+        formBonds(i);
         forceBalance(i);
         particle.updateVelocity();
         particle.updatePosition();
     }
+    drawBonds(context);
 }
 
 function detectCollisions(i) {
@@ -133,53 +136,61 @@ function solveElasticCollision(particle, collision) {
     }
 }
 
-function formBonds(i, context) {
+function formBonds(i) {
     let particleOne = levelOne[i];
-    let particleOneGaps = particleOne.electronGap;
     let particleOneBonds = particleOne.bonds;
     for (let j = i + 1; j < levelOne.length; j++) {
         let particleTwo = levelOne[j];
-        let particleTwoGaps = particleTwo.electronGap;
         let particleTwoBonds = particleTwo.bonds;
         let distance = particleOne.position.subtract(particleTwo.position).magnitude();
+
+        let bondExists = bonds.find(
+            x => x.firstElement.id === particleOne.id && x.secondElement.id === particleTwo.id
+            )
+        
         if (distance <= CHECK_RADIUS) {
-            if (!particleOneBonds.includes(j)) {
-                particleOneBonds.push(j);
-                particleTwoBonds.push(i);
-                particleOneGaps -= 1;
-                particleTwoGaps -= 1;
+            let bond = new Bond(bondId, particleOne, particleTwo, 100, 100, 1);
+            if (!bondExists) {
+                particleOneBonds.push(bond);
+                particleTwoBonds.push(bond);
+                bonds.push(bond);
+                particleOne.electronGap -= 1;
+                particleTwo.electronGap -= 1;
                 particleOne.charge -= 1;
                 particleTwo.charge -= 1;
+            } else {
+                let gapsAvailable = particleOne.electronGap >= 1 && particleTwo.electronGap >= 1;
+                if (gapsAvailable && bond.bondOrder < 3) {
+                    particleOne.electronGap -= 1;
+                    particleTwo.electronGap -= 1;
+                    particleOne.charge -= 1;
+                    particleTwo.charge -= 1;
+                    bondExists.bondOrder += 1;
+                }
             }
-            drawBonds(i, j, context);
+            bondId += 1;
         }
         if (
             distance > CHECK_RADIUS &&
-            particleOneBonds.includes(j)
+            bondExists
         ) {
-            particleOneBonds = particleOneBonds.splice(particleOneBonds.indexOf(j));
-            particleTwoBonds = particleTwoBonds.splice(particleTwoBonds.indexOf(i));
-            particleOneGaps += 1;
-            particleTwoGaps += 1;
-            particleOne.charge += 1;
-            particleTwo.charge += 1;
+            let bond = bondExists;
+            particleOneBonds.splice(particleOneBonds.indexOf(bond), 1);
+            particleTwoBonds.splice(particleTwoBonds.indexOf(bond), 1);
+            bonds.splice(bonds.indexOf(bond), 1);
+            particleOne.electronGap += bond.bondOrder;
+            particleTwo.electronGap += bond.bondOrder;
+            particleOne.charge += bond.bondOrder;
+            particleTwo.charge += bond.bondOrder;
         }
     }
 }
 
-function drawBonds(i, j, context) {
-
-    let particleOne = levelOne[i];
-    let particleTwo = levelOne[j];
-
-    //Set line stroke and width
-    context.lineWidth = 5;
-
-    //Draw a line
-    context.beginPath();
-    context.moveTo(particleOne.position[0] + particleOne.radius, particleOne.position[1] + particleOne.radius);
-    context.lineTo(particleTwo.position[0] + particleTwo.radius, particleTwo.position[1] + particleTwo.radius);
-    context.stroke();
+function drawBonds(context) {
+    for (let i = 0; i < bonds.length; i++) {
+        let bond = bonds[i];
+        bond.draw(context);
+    }
 }
 
 function forceBalance(i) {
@@ -192,8 +203,7 @@ function forceBalance(i) {
         let otherBodyPosition = otherBody.position;
         let delta = particlePosition.subtract(otherBodyPosition);
         let distance = delta.magnitude();
-        let force = 50 * (particleCharge * otherBodyCharge) / (distance ** 2);
-        let acceleration = delta.multByNum(force);
+        let force =  50 * (particleCharge * otherBodyCharge) / (distance ** 2);
         let particleAcceleration = delta.multByNum(force).divByNum(particle.mass);
         let otherBodyAcceleration = delta.multByNum(force).divByNum(otherBody.mass);
         if (distance > 50) {

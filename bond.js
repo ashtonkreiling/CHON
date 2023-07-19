@@ -1,4 +1,5 @@
 export class Bond {
+    id;
     firstElementType;
     secondElementType;
     bondLength;
@@ -6,39 +7,65 @@ export class Bond {
     secondElementId;
 
     constructor(
-        firstElementType,
-        secondElementType,
+        id,
+        firstElement,
+        secondElement,
         bondLength,
-        firstElementId,
-        secondElementId
+        bondEnergy,
+        bondOrder
     ) {
-        this.firstElementType = firstElementType;
-        this.secondElementType = secondElementType;
+        this.id = id;
+        this.firstElement = firstElement;
+        this.secondElement = secondElement;
         this.bondLength = bondLength;
-        this.firstElementId = firstElementId;
-        this.secondElementId = secondElementId;
+        this.bondEnergy = bondEnergy;
+        this.bondOrder = bondOrder;
     }
 
-    draw() {
-        throw new Error('Bonds Must Provide Their Own Draw Method');
-    }
-}
-
-// Represents a single bond between two atoms
-export class Sigma extends Bond {
-
-    draw(particleOne, particleTwo, context) {
-        //Set line stroke and width
+    draw(context) {
         context.lineWidth = 5;
+        let startLine = this.firstElement.position.addNum(this.firstElement.radius);
+        let endLine = this.secondElement.position.addNum(this.secondElement.radius);
+        switch(this.bondOrder) {
+            case 1:
+                context.beginPath();
+                context.moveTo(...startLine);
+                context.lineTo(...endLine);
+                context.stroke();
+                break;
+            case 2:
+                //Bond One
+                context.beginPath();
+                context.moveTo(...startLine.addNum(10));
+                context.lineTo(...endLine.addNum(10));
+                context.stroke();
 
-        //Draw a line
-        context.beginPath();
-        context.moveTo(particleOne.position[0] + particleOne.radius, particleOne.position[1] + particleOne.radius);
-        context.lineTo(particleTwo.position[0] + particleTwo.radius, particleTwo.position[1] + particleTwo.radius);
-        context.stroke();
+                //Bond Two
+                context.beginPath();
+                context.moveTo(...startLine.subNum(10));
+                context.lineTo(...endLine.subNum(10));
+                context.stroke();
+                break;
+            case 3:
+                //Bond One
+                context.beginPath();
+                context.moveTo(...startLine.addNum(15));
+                context.lineTo(...endLine.addNum(15));
+                context.stroke();
+
+                //Bond Two
+                context.beginPath();
+                context.moveTo(...startLine);
+                context.lineTo(...endLine);
+                context.stroke();
+
+                //Bond Three
+                context.beginPath();
+                context.moveTo(...startLine.subNum(15));
+                context.lineTo(...endLine.subNum(15));
+                break;
+            default:
+                console.log("MORE THAN 3");
+        }
     }
-
 }
-
-export class Pi extends Bond {}
-

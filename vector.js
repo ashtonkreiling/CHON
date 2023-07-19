@@ -23,4 +23,10 @@ export class Vector extends Array {
     divByNum(num) {
         return this.map(x => x / num);
     }
+    addNum(num) {
+        return this.map(x => x + num);
+    }
+    subNum(num) {
+        return this.map(x => x - num);
+    }
 }
