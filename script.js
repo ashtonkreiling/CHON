@@ -1,5 +1,3 @@
-import { Oxygen } from "./oxygen.js";
-import { Carbon } from "./carbon.js";
 import { updateScene } from "./engine.js";
 import { levelOne } from "./levels.js";
 
@@ -16,16 +14,51 @@ const oxygen = levelOne[0];
 const carbon = levelOne[1];
 
 let i = 0;
+let isPaused = false; // Flag to track if the animation is paused
+let originalImageData; // To store the original canvas content
+
 
 function animate(){
-    i++;
-    context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-    context.drawImage(oxygen.image, 0, 0, ATOM_WIDTH, ATOM_HEIGHT, oxygen.position[0], oxygen.position[1], 200, 200);
-    context.drawImage(carbon.image, 0, 0, ATOM_WIDTH, ATOM_HEIGHT, carbon.position[0], carbon.position[1], 200, 200);
-    if (i % 1 == 0) {
-        updateScene(context);
-    }
+    if (!isPaused) {
+        i++;
+        context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        context.drawImage(oxygen.image, 0, 0, ATOM_WIDTH, ATOM_HEIGHT, oxygen.position[0], oxygen.position[1], 200, 200);
+        context.drawImage(carbon.image, 0, 0, ATOM_WIDTH, ATOM_HEIGHT, carbon.position[0], carbon.position[1], 200, 200);
+        if (i % 1 == 0) {
+            updateScene(context);
+        }
     
-    requestAnimationFrame(animate);
+        requestAnimationFrame(animate);
+    } else {
+        if (!originalImageData) {
+            originalImageData = context.getImageData(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+            context.fillStyle = "rgba(0, 0, 0, 0.5)";
+            context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+          }
+    }
 }
+
+function handlePauseAndDarken() {
+    if (isPaused) {
+      // Resume the animation and remove the darkening effect
+      isPaused = false;
+      restoreCanvas();
+      animate();
+    } else {
+      // Pause the animation and display the darkening effect
+      isPaused = true;
+    }
+  }
+  
+  function restoreCanvas() {
+    // Restore the original canvas content
+    if (originalImageData) {
+      context.putImageData(originalImageData, 0, 0);
+      originalImageData = null;
+    }
+  }
+  
+  // Attach click event listener to the whole document
+  canvas.addEventListener("click", handlePauseAndDarken);  
+
 animate();
