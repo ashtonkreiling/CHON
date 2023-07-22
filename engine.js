@@ -160,7 +160,8 @@ function formBonds(i) {
                 particleTwo.charge -= 1;
             } else {
                 let gapsAvailable = particleOne.electronGap >= 1 && particleTwo.electronGap >= 1;
-                if (gapsAvailable && bond.bondOrder < 3) {
+                console.log(bondExists.bondOrder);
+                if (gapsAvailable && bondExists.bondOrder < 3) {
                     particleOne.electronGap -= 1;
                     particleTwo.electronGap -= 1;
                     particleOne.charge -= 1;

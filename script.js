@@ -38,16 +38,21 @@ function animate(){
     }
 }
 
-function handlePauseAndDarken() {
-    if (isPaused) {
-      // Resume the animation and remove the darkening effect
-      isPaused = false;
-      restoreCanvas();
-      animate();
-    } else {
-      // Pause the animation and display the darkening effect
-      isPaused = true;
+  function pause() {
+    if (!isPaused) {
+        console.log(isPaused);
+        isPaused = true;
+        console.log(isPaused);
     }
+  }
+
+  function unpause() {
+    if (isPaused) {
+        isPaused = false;
+        restoreCanvas();
+        animate();
+    }
+    
   }
   
   function restoreCanvas() {
@@ -58,7 +63,7 @@ function handlePauseAndDarken() {
     }
   }
   
-  // Attach click event listener to the whole document
-  canvas.addEventListener("click", handlePauseAndDarken);  
+  canvas.addEventListener("mousedown", pause);
+  document.addEventListener("mouseup", unpause);
 
 animate();
