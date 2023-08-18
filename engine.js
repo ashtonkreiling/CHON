@@ -6,7 +6,7 @@ const CANVAS_WIDTH = 600;
 const CHECK_RADIUS = 200;
 
 
-let bonds = [];
+export let bonds = [];
 let bondId = 0;
 
 export function updateScene(context) {
@@ -160,7 +160,6 @@ function formBonds(i) {
                 particleTwo.charge -= 1;
             } else {
                 let gapsAvailable = particleOne.electronGap >= 1 && particleTwo.electronGap >= 1;
-                console.log(bondExists.bondOrder);
                 if (gapsAvailable && bondExists.bondOrder < 3) {
                     particleOne.electronGap -= 1;
                     particleTwo.electronGap -= 1;
@@ -207,9 +206,34 @@ function forceBalance(i) {
         let force =  50 * (particleCharge * otherBodyCharge) / (distance ** 2);
         let particleAcceleration = delta.multByNum(force).divByNum(particle.mass);
         let otherBodyAcceleration = delta.multByNum(force).divByNum(otherBody.mass);
-        if (distance > 50) {
+        if (distance > 150) {
             particle.velocity = particle.velocity.subtract(particleAcceleration);
             otherBody.velocity = otherBody.velocity.add(otherBodyAcceleration);
+        }
+    }
+    bondForceBalance(i);
+}
+
+function bondForceBalance(i) {
+    let particleOne = levelOne[i];
+    let particleBonds = bonds.filter(x => x.firstElement.id === particleOne.id);
+    for (let j=0; j<particleBonds.length; j++) {
+        let bond = particleBonds[j];
+        let particleTwo = levelOne[bond.secondElement.id];
+        let delta = particleOne.position.subtract(particleTwo.position);
+        let distance = delta.magnitude();
+        let bondLengthDifference = Math.abs(distance - bond.bondLength);
+        let force = .1 / bondLengthDifference;
+        let particleAcceleration = delta.multByNum(force).divByNum(particleOne.mass);
+
+        if (distance > bond.bondLength) {
+            particleOne.velocity = particleOne.velocity.subtract(particleAcceleration);
+        } else if (distance < bond.bondLength) {
+            particleOne.velocity = particleOne.velocity.add(particleAcceleration);
+        }
+
+        if (bondLengthDifference < 20) {
+            particleOne.velocity = particleOne.velocity.multByNum(.5);
         }
     }
 }
