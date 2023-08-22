@@ -1,5 +1,6 @@
-import { updateScene } from "./engine.js";
+import { bonds, updateScene } from "./engine.js";
 import { levelOne } from "./levels.js";
+import { Vector } from "./vector.js";
 
 const canvas = document.getElementById('gameCanvas');
 export const context = canvas.getContext('2d');
@@ -38,11 +39,25 @@ function animate(){
     }
 }
 
-  function pause() {
+  function pause(event) {
     if (!isPaused) {
-        console.log(isPaused);
         isPaused = true;
-        console.log(isPaused);
+        let mousePosition = new Vector(
+            event.clientX,
+            event.clientY
+        )
+        let lowestMagnitude = 999999;
+        let nearestParticleIndex = -1;
+
+        for (let i = 0; i < levelOne.length; i++) {
+            let currentMagnitude = levelOne[i].position.subtract(mousePosition).magnitude();
+            if (currentMagnitude < lowestMagnitude) {
+                lowestMagnitude = currentMagnitude;
+                nearestParticleIndex = i;
+            }
+        }
+
+        console.log(levelOne[nearestParticleIndex]);
     }
   }
 
