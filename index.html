@@ -8,7 +8,14 @@
         <link rel="stylesheet" href="style.css"/>
     </head>
     <body>
+        <div class="menuDiv" id="menuDivLeft">
+            <div class="menuButton" onclick="handleButtonClick(0)"></div>
+            <div class="menuButton" onclick="handleButtonClick(1)"></div>
+            <div class="menuButton" onclick="handleButtonClick(2)"></div>
+            <div class="menuButton" onclick="handleButtonClick(3)"></div>
+        </div>
         <canvas id="gameCanvas"></canvas>
+        <div class="menuDiv" id="menuDivRight"></div>
         <script src="script.js" type="module"></script>
     </body>
 </html>
