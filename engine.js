@@ -203,7 +203,7 @@ function forceBalance(i) {
         let otherBodyPosition = otherBody.position;
         let delta = particlePosition.subtract(otherBodyPosition);
         let distance = delta.magnitude();
-        let force =  50 * (particleCharge * otherBodyCharge) / (distance ** 2);
+        let force =  100 * (particleCharge * otherBodyCharge) / (distance ** 2);
         let particleAcceleration = delta.multByNum(force).divByNum(particle.mass);
         let otherBodyAcceleration = delta.multByNum(force).divByNum(otherBody.mass);
         if (distance > 150) {
@@ -223,17 +223,22 @@ function bondForceBalance(i) {
         let delta = particleOne.position.subtract(particleTwo.position);
         let distance = delta.magnitude();
         let bondLengthDifference = Math.abs(distance - bond.bondLength);
-        let force = .1 / bondLengthDifference;
+        let force = .01 / bondLengthDifference;
+        console.log(force);
         let particleAcceleration = delta.multByNum(force).divByNum(particleOne.mass);
+        console.log(particleAcceleration);
 
         if (distance > bond.bondLength) {
             particleOne.velocity = particleOne.velocity.subtract(particleAcceleration);
+            particleTwo.velocity = particleTwo.velocity.add(particleAcceleration);
         } else if (distance < bond.bondLength) {
             particleOne.velocity = particleOne.velocity.add(particleAcceleration);
+            particleTwo.velocity = particleTwo.velocity.subtract(particleAcceleration);
         }
 
         if (bondLengthDifference < 20) {
             particleOne.velocity = particleOne.velocity.multByNum(.5);
+            particleTwo.velocity = particleTwo.velocity.multByNum(.5);
         }
     }
 }
