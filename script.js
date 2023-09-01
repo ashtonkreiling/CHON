@@ -33,7 +33,7 @@ function animate(){
     } else {
         if (!originalImageData) {
             originalImageData = context.getImageData(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-            context.fillStyle = "rgba(0, 0, 0, 0.5)";
+            context.fillStyle = "rgba(0, 0, 0, 0.2)";
             context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
           }
     }

@@ -36,8 +36,16 @@
     border-radius: 5px; /* Rounded corners */
     cursor: pointer; /* Show pointer cursor on hover */
     transition: background-color 0.3s; /* Smooth transition */
+      /* Center vertically and horizontally */
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .menuButton:hover {
-    background-color: #ddd; /* Darker background color on hover */
+    filter: brightness(90%); /* Darker background color on hover */
+}
+
+.menuButton:active {
+    filter: brightness(80%);
 }
