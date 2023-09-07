@@ -90,4 +90,29 @@ function animate(){
   canvas.addEventListener("mousedown", pause);
   document.addEventListener("mouseup", unpause);
 
+  function handleButtonClick(button) {
+    // Get the buttonIndex from the data attribute
+    const buttonIndex = button.getAttribute("data-button-index");
+
+    // Find the associated <h6> element within the clicked button
+    const h6Element = button.querySelector("h6");
+    console.log("GOT HERE");
+    // Check if the <h6> element exists
+    if (h6Element) {
+      // Change the text of the <h6> element
+      h6Element.textContent = "New Subheading for Button " + buttonIndex;
+    }
+    
+    // Add your additional click handling logic here
+}
+
+// Add event listeners to all elements with the class 'menuButton'
+const menuButtons = document.querySelectorAll('.menuButton');
+
+menuButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        handleButtonClick(button);
+    });
+});
+
 animate();

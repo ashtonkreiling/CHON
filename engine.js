@@ -224,9 +224,7 @@ function bondForceBalance(i) {
         let distance = delta.magnitude();
         let bondLengthDifference = Math.abs(distance - bond.bondLength);
         let force = .01 / bondLengthDifference;
-        console.log(force);
         let particleAcceleration = delta.multByNum(force).divByNum(particleOne.mass);
-        console.log(particleAcceleration);
 
         if (distance > bond.bondLength) {
             particleOne.velocity = particleOne.velocity.subtract(particleAcceleration);
