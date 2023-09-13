@@ -26,7 +26,7 @@ export function updateScene(context) {
 
 function detectCollisions(i) {
     let particle = levelOne[i];
-    let collision = [0, 0, 0]; // depth, angle
+    let collision = [0, 0, 0]; // depth, angle, other particle ID
     let depth = 0;
     let direction = 0;
     let particleXPosition = particle.position[0];

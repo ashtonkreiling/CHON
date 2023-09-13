@@ -1,6 +1,10 @@
 import { bonds, updateScene } from "./engine.js";
 import { levelOne } from "./levels.js";
 import { Vector } from "./vector.js";
+import { Carbon } from "./carbon.js";
+import { Hydrogen } from "/hydrogen.js";
+import { Nitrogen } from "./nitrogen.js";
+import { Oxygen } from "./oxygen.js";
 
 const canvas = document.getElementById('gameCanvas');
 export const context = canvas.getContext('2d');
@@ -95,15 +99,74 @@ function animate(){
     const buttonIndex = button.getAttribute("data-button-index");
 
     // Find the associated <h6> element within the clicked button
-    const h6Element = button.querySelector("h6");
-    console.log("GOT HERE");
+    const buttonCount = button.querySelector("h6");
     // Check if the <h6> element exists
-    if (h6Element) {
+
+    let validCounter = false;
+
+    if (buttonCount) {
+
+      let oldCount = parseInt(buttonCount.textContent);
+      let newCount = String(oldCount - 1);
+      validCounter = newCount >= 0;
+
       // Change the text of the <h6> element
-      h6Element.textContent = "New Subheading for Button " + buttonIndex;
+      if (validCounter) {
+        buttonCount.textContent = newCount;
+      }
+    }
+
+    if (validCounter) {
+      const buttonName = button.querySelector("h1").textContent;
+      let newParticleOne;
+      let newParticleTwo;
+      let origin = new Vector(0, 0);
+      switch (buttonName) {
+        case "C2":
+          newParticleOne = new Carbon(levelOne.length, origin);
+          newParticleTwo = new Carbon(
+            levelOne.length + 1, 
+            origin.addNum(newParticleOne.radius * 2), 
+            newParticleOne.velocity
+            )
+          levelOne.push(newParticleOne);
+          levelOne.push(newParticleTwo);
+          break;
+        case "O2":
+          newParticleOne = new Oxygen(levelOne.length, origin);
+          newParticleTwo = new Oxygen(
+            levelOne.length + 1, 
+            origin.addNum(newParticleOne.radius * 2), 
+            newParticleOne.velocity
+            )
+          levelOne.push(newParticleOne);
+          levelOne.push(newParticleTwo);
+          break;
+        case "N2":
+          newParticleOne = new Nitrogen(levelOne.length, origin);
+          newParticleTwo = new Nitrogen(
+            levelOne.length + 1, 
+            origin.addNum(newParticleOne.radius * 2), 
+            newParticleOne.velocity
+            )
+          levelOne.push(newParticleOne);
+          levelOne.push(newParticleTwo);
+          break;
+        case "H2":
+          newParticleOne = new Hydrogen(levelOne.length, origin);
+          newParticleTwo = new Hydrogen(
+            levelOne.length + 1, 
+            origin.addNum(newParticleOne.radius * 2), 
+            newParticleOne.velocity
+            )
+          levelOne.push(newParticleOne);
+          levelOne.push(newParticleTwo);
+          break;
+      }
+    } else {
+
     }
     
-    // Add your additional click handling logic here
 }
 
 // Add event listeners to all elements with the class 'menuButton'
