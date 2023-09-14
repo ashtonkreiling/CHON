@@ -37,19 +37,10 @@ export class Particle {
         this.position = this.position.add(this.velocity);
     }
 
-    updateVelocity() {
-        /*Need to add the following elements
-         1. Particle Speeds Up Based On Surrounding Electric Charges
-         2. Particle Slows Down From Bond Formation
-         3. Particle Speeds Up From Bond Breakage
-         5. Particle Bounces Off Other Particles*/
+    findRelativeOrientation(otherParticle) {
+        let delta = this.position.subtract(otherParticle.position);
+        let depth = this.radius + otherParticle.radius - delta.magnitude();
+        let direction = Math.abs(Math.atan(delta[0]/delta[1]));
+        return [depth, direction, otherParticle.id]
     }
-
-    updateBonds() {
-        /*Need to add the following elements
-        1. If another particle exists within CHECK_RADIUS pixels and both particles have
-        an electron gap, create a new bond, update 
-        */
-    }
-
 }

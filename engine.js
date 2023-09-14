@@ -18,7 +18,6 @@ export function updateScene(context) {
         }
         formBonds(i);
         forceBalance(i);
-        particle.updateVelocity();
         particle.updatePosition();
     }
     drawBonds(context);
@@ -61,13 +60,9 @@ function detectCollisions(i) {
 
     for (let j = i + 1; j < levelOne.length; j++) {
         let particleTwo = levelOne[j];
-        let delta = particle.position.subtract(particleTwo.position);
-        if (delta.magnitude() < (particle.radius + particleTwo.radius)) {
-            depth = particle.radius + particleTwo.radius - delta.magnitude();
-            direction = Math.abs(Math.atan(delta[0]/delta[1]));
-            if (depth > collision[0]) {
-                collision = [depth, direction, j];
-            }
+        let orientation = particle.findRelativeOrientation(particleTwo);
+        if (orientation[0] > collision[0]) {
+            collision = orientation;
         }
     }
     return collision;
@@ -150,7 +145,8 @@ function formBonds(i) {
         
         if (distance <= CHECK_RADIUS) {
             let bond = new Bond(bondId, particleOne, particleTwo, 100, 100, 1);
-            if (!bondExists) {
+            let gapsAvailable = particleOne.electronGap >= 1 && particleTwo.electronGap >= 1;
+            if (!bondExists && gapsAvailable) {
                 particleOneBonds.push(bond);
                 particleTwoBonds.push(bond);
                 bonds.push(bond);
@@ -159,7 +155,6 @@ function formBonds(i) {
                 particleOne.charge -= 1;
                 particleTwo.charge -= 1;
             } else {
-                let gapsAvailable = particleOne.electronGap >= 1 && particleTwo.electronGap >= 1;
                 if (gapsAvailable && bondExists.bondOrder < 3) {
                     particleOne.electronGap -= 1;
                     particleTwo.electronGap -= 1;
@@ -225,6 +220,7 @@ function bondForceBalance(i) {
         let bondLengthDifference = Math.abs(distance - bond.bondLength);
         let force = .01 / bondLengthDifference;
         let particleAcceleration = delta.multByNum(force).divByNum(particleOne.mass);
+        let direction = Math.abs(Math.atan(delta[0]/delta[1]));
 
         if (distance > bond.bondLength) {
             particleOne.velocity = particleOne.velocity.subtract(particleAcceleration);
@@ -235,8 +231,15 @@ function bondForceBalance(i) {
         }
 
         if (bondLengthDifference < 20) {
-            particleOne.velocity = particleOne.velocity.multByNum(.5);
-            particleTwo.velocity = particleTwo.velocity.multByNum(.5);
+            let rotatedVelocityOne = rotateCoordinates(particleOne.velocity, direction);
+            let rotatedVelocityTwo = rotateCoordinates(particleTwo.velocity, -direction);
+            let velocityReduction = new Vector(.95, .5)
+            rotatedVelocityOne = rotatedVelocityOne.multiply(velocityReduction);
+            rotatedVelocityTwo = rotatedVelocityTwo.multiply(velocityReduction);
+            particleOne.velocity = rotateCoordinates(rotatedVelocityOne, -direction);
+            particleTwo.velocity = rotateCoordinates(rotatedVelocityTwo, direction);
+            //particleOne.velocity = particleOne.velocity.multByNum(.5);
+            //particleTwo.velocity = particleTwo.velocity.multByNum(.5);
         }
     }
 }
